@@ -1,0 +1,29 @@
+package layout
+
+templ header(){
+
+    <nav class="container">
+        <ul class="brand">
+            <li>
+                <a class="" href="https://itsigo.de">
+                <img href="/" src="/tally-logo-no-bg.png" height="50" />
+                </a>
+            </li>
+        </ul>
+        <ul hx-target="main">
+            <li>
+                <a class="contrast" 
+                    hx-get="/"
+                    hx-push-url="true"
+                >Home</a>
+            </li>
+            <li>
+                <a class="contrast" 
+                    hx-get="/hp-mana-tracker"
+                    hx-push-url="true"
+                >TM-Tracker</a>
+            </li>
+        </ul>
+    </nav>
+
+}

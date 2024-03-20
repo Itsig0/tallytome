@@ -1,0 +1,455 @@
+@use "pico/pico" with (
+    $theme-color: "cyan",
+    $modules: (
+        "themes/default": false,
+
+        // Layout
+        "layout/document": true,
+        "layout/landmarks": true,
+        "layout/container": true,
+        "layout/section": true,
+        "layout/grid": true,
+        "layout/overflow-auto": false,
+
+        // Content
+        "content/link": true,
+        "content/typography": true,
+        "content/embedded": true,
+        "content/button": true,
+        "content/table": false,
+        "content/code": false,
+        "content/figure": false,
+        "content/miscs": true,
+
+        // Forms
+        "forms/basics": true,
+        "forms/checkbox-radio-switch": true,
+        "forms/input-color": false,
+        "forms/input-date": false,
+        "forms/input-file": false,
+        "forms/input-range": false,
+        "forms/input-search": false,
+
+        // Components
+        "components/accordion": true,
+        "components/card": false,
+        "components/dropdown": false,
+        "components/group": true,
+        "components/loading": false,
+        "components/modal": false,
+        "components/nav": true,
+        "components/progress": true,
+        "components/tooltip": false,
+
+        // Utilities
+        "utilities/accessibility": true,
+        "utilities/reduce-motion": true
+    )
+);
+
+@use "pico/colors/index" as *;
+
+@use "custom/styles";
+@use "custom/schemes";
+
+:root{
+//     // https://coolors.co/00072d-001c55-0a2472-0e6ba8-a6e1fa
+//     --font-size: 1.2rem;
+//     --border-radius: 5px;
+//     --focus-boxshadow: 0.2rem;
+
+//     --pico-primary: hsl(204, 85%, 36%);
+
+//     --focus: hsl(204, 85%, 50%);
+
+//     --grey0: hsl(0, 0%, 0%);
+//     --grey1: hsl(0, 0%, 10%);
+//     --grey2: hsl(0, 0%, 20%);
+//     --grey3: hsl(0, 0%, 30%);
+//     --grey4: hsl(0, 0%, 40%);
+//     --grey5: hsl(0, 0%, 50%);
+//     --grey6: hsl(0, 0%, 60%);
+//     --grey7: hsl(0, 0%, 70%);
+//     --grey8: hsl(0, 0%, 80%);
+//     --grey9: hsl(0, 0%, 90%);
+//     --grey10: hsl(0, 0%, 100%);
+
+    // --color-ok: #{$green-500};
+    // --color-warning: #{$pumpkin-300};
+    // --color-danger: #{$red-500};
+
+    --color-hp: #{$red-400};
+    --color-mana: #{$azure-350};
+
+}
+
+// *, ::after, ::before {
+//     box-sizing: border-box;
+//     background-repeat: no-repeat;
+// }
+
+// .ok-helper{
+//     color: --color-ok;
+//     &::-moz-progress-bar {
+//         background-color: var(--color-ok);
+//     }
+// }
+
+// .warning-helper{
+//     color: var(--color-warning);
+//     &::-moz-progress-bar {
+//         background-color: var(--color-warning);
+//     }
+// }
+
+// .danger-helper{
+//     color: var(--color-danger);
+//     &::-moz-progress-bar {
+//         background-color: var(--color-danger);
+//     }
+// }
+
+.text-center{
+    text-align: center;
+}
+
+.text-right{
+    text-align: right;
+}
+
+// body{
+//     margin: 0;
+//     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+//     font-size: var(--font-size);
+// }
+
+
+// basic container
+// .container{
+//     width: 100%;
+//     padding-left: 1rem;
+//     padding-right: 1rem;
+//     margin-left: auto;
+//     margin-right: auto;
+// }
+
+// @media (min-width: 576px){
+//     .container{
+//         width: clamp(510px, 90%, 1920px);
+//         padding: 0;
+//     }
+// }
+
+a {
+    cursor: pointer;
+}
+
+// progress
+progress{
+    height: 1.25rem;
+}
+
+// stat container
+.stat-container{
+    display: flex;
+    margin-bottom: var(--pico-spacing);
+
+    .start{
+        justify-content: flex-start;
+        margin-right: auto;
+    }
+
+    .middle{
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .end{
+        justify-content: flex-end;
+        margin-left: auto;
+    }
+}
+
+.lbl-offset{
+    display: flex;
+    margin-bottom: calc(var(--pico-spacing) * 0.4);
+
+    button{
+        margin-top: auto;
+    }
+}
+
+
+.progress{
+    border-radius: var(--pico-border-radius);
+    color: var(--pico-contrast);
+    height: 1.25rem;
+    background-color: var(--pico-progress-background-color);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: calc(var(--pico-spacing) * .5);
+   
+
+    .progress-label{
+        position: absolute;
+        top: 0;
+        z-index: 20;
+        font-size: 0.9rem;
+    }
+    div{
+        height: 100%;
+        border-radius: var(--pico-border-radius);
+        background: var(--pico-primary);
+        position: relative;
+        z-index: 10;
+        align-self: start;
+        margin-right: auto;
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+
+        &.mana{
+            background-color: var(--color-mana);
+            animation-name: manaAnimation;
+            @keyframes manaAnimation {
+                0%   {width: var(--mana-from-width);}
+                100% {width: var(--mana-to-width);}
+            }
+        }
+        &.hp{
+            background-color: var(--color-hp);
+            animation-name: hpAnimation;
+            @keyframes hpAnimation {
+                0%   {width: var(--hp-from-width);}
+                100% {width: var(--hp-to-width);}
+            }
+        }
+       
+    }
+}
+
+
+
+
+
+// utility
+// margins
+
+.mb-0{
+    margin-bottom: 0 !important;
+}
+
+.mb-1{
+    margin-bottom: calc(var(--pico-spacing) * .25);
+}
+
+.mb-2{
+    margin-bottom: calc(var(--pico-spacing) * .50);
+}
+
+.mb-3{
+    margin-bottom: calc(var(--pico-spacing) * .75);
+}
+
+.mb-4{
+    margin-bottom: var(--pico-spacing);
+}
+
+// form elements
+
+// form{
+//     button{
+//         width: 100%;
+//     }
+// }
+
+
+// input{
+//     border: 1px var(--grey8) solid;
+//     outline: 0;
+//     border-radius: var(--border-radius);
+//     box-shadow: none;
+//     font-size: var(--font-size);
+//     background-color: var(--grey10);
+
+//     &:not([type="checkbox"], [type="radio"], [type="range"]) {
+//         width: 100%;
+//         padding: 0.75rem;
+//     }
+
+//     &:not([type="checkbox"], [type="radio"]), select, textarea {
+//         margin-bottom: 1rem;
+//     }
+    
+//     &:not([type="submit"], [type="button"], [type="reset"], [type="range"], [type="file"], [readonly]):focus {
+//         border-color:  var(--primary);
+//     }
+// }
+
+// button{
+//     font-family: inherit;
+//     font-size: var(--font-size);
+//     outline: 0;
+//     border: 0;
+//     border-radius: var(--border-radius);
+//     box-shadow: none;
+//     color: var(--grey10);
+//     background-image: linear-gradient(rgb(0 0 0/40%) 0 0);
+//     background-color: var(--primary);
+//     padding: 0.75rem 1.25rem;
+//     cursor: pointer;
+//     background-blend-mode: lighten;
+
+//     &:hover{
+//         background-blend-mode: darken;
+//     }
+// }
+
+// label:has([type="checkbox"], [type="radio"]) {
+//     width: -moz-fit-content;
+//     width: fit-content;
+//     cursor: pointer;
+// }
+
+// label {
+//     display: block;
+//     margin-bottom: 1rem;
+// }
+
+// [type="checkbox"], [type="radio"] {
+//     -webkit-appearance: none;
+//     -moz-appearance: none;
+//     appearance: none;
+//     width: 1.25em;
+//     height: 1.25em;
+//     margin-top: -.125em;
+//     margin-inline-end: .5em;
+//     border-width: 1px;
+//     vertical-align: middle;
+//     cursor: pointer;
+// }
+
+// [type="checkbox"][role="switch"] {
+//     width: 2.25em;
+//     height: 1.25em;
+//     border: 2px solid var(--grey8);
+//     border-radius: 1.25em;
+//     background-color: var(--grey8);
+//     line-height: 1.25em;
+
+//     &::before {
+//         display: block;
+//         width: calc(1.25em - .1rem * 2);
+//         height: 100%;
+//         border-radius: 50%;
+//         background-color: var(--grey10);
+
+//         content: "";
+//         transition: margin .2s ease-in-out;
+//     }
+
+//     &:focus{
+//         border-color: var(--focus);
+//     }
+//     &:checked{
+//         border-color: var(--focus);
+//         background-color: var(--primary);
+//         background-image: none;
+//         &:before {
+//             margin-inline-start: calc(1.125em - .24rem);
+//           }
+//     }
+// }
+
+
+
+// progress bar
+// progress{
+//     -moz-appearance: none;
+//     appearance: none;
+
+//     display: inline-block;
+//     width: 100%;
+//     color: var(--primary);
+//     background: var(--grey9);
+//     border: 0;
+//     border-radius: var(--border-radius);
+
+//     &::-webkit-progress-bar {
+//         border-radius: var(--border-radius);
+//         background: none;
+//     }
+
+//     &[value]::-webkit-progress-value {
+       
+//         border-radius: var(--border-radius);
+       
+//     }   
+
+//     &::-moz-progress-bar {
+//         background-color: var(--primary);
+//     }
+
+
+//     &:indeterminate {
+//         background: var(--grey9)
+//             linear-gradient(
+//                 to right,
+//                 var(--primary) 30%,
+//                 var(--grey9) 30%
+//             ) 
+//         top left/150% 150% no-repeat;
+//         animation: progress-indeterminate 1.5s linear infinite;
+    
+//         &[value]::-webkit-progress-value {
+//         background-color: transparent;
+//         }
+    
+//         &::-moz-progress-bar {
+//         background-color: transparent;
+//         }
+//     }
+
+//     @keyframes progress-indeterminate {
+//         0% {
+//           background-position: 200% 0;
+//         }
+    
+//         100% {
+//           background-position: -200% 0;
+//         }
+//       }
+// }
+
+
+// groups
+// [role="group"], [role="search"] {
+//     display: inline-flex;
+//     position: relative;
+//     width: 100%;
+//     margin-bottom: 1rem;
+//     border-radius: var(--border-radius);
+//     box-shadow: var(--focus,0 0 0 transparent);
+//     vertical-align: middle;
+//     // transition: box-shadow var(--pico-transition);
+// }
+
+// [role="group"] input:not([type="checkbox"], [type="radio"]), [role="group"] select, [role="group"] > *, [role="search"] input:not([type="checkbox"], [type="radio"]), [role="search"] select, [role="search"] > * {
+//     position: relative;
+//     flex: 1 1 auto;
+//     margin-bottom: 0;
+// }
+
+// [role="group"] input:not([type="checkbox"], [type="radio"]):not(:last-child), [role="group"] select:not(:last-child), [role="group"] > :not(:last-child), [role="search"] input:not([type="checkbox"], [type="radio"]):not(:last-child), [role="search"] select:not(:last-child), [role="search"] > :not(:last-child) {
+//     border-top-right-radius: 0;
+//     border-bottom-right-radius: 0;
+//     border-right: 0;
+// }
+
+// [role="group"] input:not([type="checkbox"], [type="radio"]):not(:first-child), [role="group"] select:not(:first-child), [role="group"] > :not(:first-child), [role="search"] input:not([type="checkbox"], [type="radio"]):not(:first-child), [role="search"] select:not(:first-child), [role="search"] > :not(:first-child) {
+//     margin-left: 0;
+//     border-top-left-radius: 0;
+//     border-bottom-left-radius: 0;
+// }
