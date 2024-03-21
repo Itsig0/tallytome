@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"fmt"
+	"math"
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/itsig0/tallytome/view/hptracker"
@@ -26,23 +30,19 @@ func Tracker(c *fiber.Ctx) error {
 
 func TrackerUpdate(c *fiber.Ctx) error {
 
-	_, err := store.Get(c)
+	sess, err := store.Get(c)
 	if err != nil {
 		return err
 	}
 
-	// Parse the form data
-	formdata := c.Context().PostArgs()
-
-	// Create an instance of TrackerData
 	data := hptracker.TrackerData{
-		HP:                  string(formdata.Peek("hp")),
-		HPBase:              string(formdata.Peek("hp")),
+		HP:                  c.FormValue("hp"),
+		HPBase:              c.FormValue("hp"),
 		HPStartPercentage:   "0",
 		HPPercentage:        "100",
-		Mana:                string(formdata.Peek("mana")),
-		ManaBase:            string(formdata.Peek("mana")),
-		ManaRegen:           string(formdata.Peek("manaregen")),
+		Mana:                c.FormValue("mana"),
+		ManaBase:            c.FormValue("mana"),
+		ManaRegen:           c.FormValue("manaregen"),
 		ManaStartPercentage: "0",
 		ManaPercentage:      "100",
 	}
@@ -55,33 +55,72 @@ func TrackerUpdate(c *fiber.Ctx) error {
 	// 	sess.Set(prefix+types.Field(i).Name, values.Field(i))
 	// 	log.Info("test")
 	// }
-	// pre := "tracker_"
-	// sess.Set(pre+"HP", data.HP)
-	// sess.Set(pre+"HPBase", data.HPBase)
-	// sess.Set(pre+"HPStartPercentage", data.HPStartPercentage)
-	// sess.Set(pre+"HPStartPercentage", data.HPStartPercentage)
+	pre := "tracker_"
+	sess.Set(pre+"HP", data.HP)
+	sess.Set(pre+"HPBase", data.HPBase)
+	sess.Set(pre+"HPPercentage", data.HPPercentage)
+	sess.Set(pre+"HPStartPercentage", data.HPStartPercentage)
 
-	// sess.Set(pre+"Mana", data.Mana)
-	// sess.Set(pre+"ManaBase", data.ManaBase)
-	// sess.Set(pre+"ManaRegen", data.ManaRegen)
-	// sess.Set(pre+"ManaStartPercentage", data.ManaStartPercentage)
-	// sess.Set(pre+"ManaPercentage", data.ManaPercentage)
+	sess.Set(pre+"Mana", data.Mana)
+	sess.Set(pre+"ManaBase", data.ManaBase)
+	sess.Set(pre+"ManaRegen", data.ManaRegen)
+	sess.Set(pre+"ManaStartPercentage", data.ManaStartPercentage)
+	sess.Set(pre+"ManaPercentage", data.ManaPercentage)
 
-	// sess.Save()
+	sess.Save()
 
 	return render(c, hptracker.TrackerColumn(data))
 }
 
 func TrackerDamage(c *fiber.Ctx) error {
 
-	// formdata := c.Context().PostArgs()
-
-	data := hptracker.TrackerData{
-		HPStartPercentage: "100",
-		HPPercentage:      "66",
+	sess, err := store.Get(c)
+	if err != nil {
+		return err
 	}
 
-	// log.Info(data)
+	damage, err := strconv.Atoi(c.FormValue("damageInput"))
+	if err != nil {
+		c.SendStatus(418)
+		return err
+	} else if damage == 0 {
+		c.SendStatus(418)
+		return c.SendString("HP NOT NULL")
+	}
+
+	currentHP, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HP")))
+	if err != nil {
+		c.SendStatus(418)
+		return err
+	}
+
+	baseHP, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HPBase")))
+	if err != nil {
+		c.SendStatus(418)
+		return err
+	}
+
+	savingThrow := string(c.FormValue("savingthrow"))
+	if savingThrow == "on" {
+		damageFloat := float64(damage) * 0.33333
+		damage -= int(math.Round(damageFloat))
+	}
+
+	newHP := currentHP - damage
+
+	newPercentage := (newHP * 100) / baseHP
+
+	data := hptracker.TrackerData{
+		HP:                fmt.Sprint(newHP),
+		HPBase:            fmt.Sprint(sess.Get("tracker_HPBase")),
+		HPStartPercentage: fmt.Sprint(sess.Get("tracker_HPPercentage")),
+		HPPercentage:      fmt.Sprint(newPercentage),
+	}
+
+	sess.Set("tracker_HP", newHP)
+	sess.Set("tracker_HPPercentage", newPercentage)
+
+	sess.Save()
 
 	return render(c, hptracker.HPTracker(data))
 }

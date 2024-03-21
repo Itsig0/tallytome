@@ -70,12 +70,12 @@ templ TrackerColumn(td TrackerData){
 }
 
 templ HPTracker(td TrackerData){
-    <span class="progress-label">TP: {td.HP}/{td.HP} </span>
+    <span class="progress-label">TP: {td.HP}/{td.HPBase} </span>
     <div class={"hp", hpAnimation(td.HPStartPercentage, td.HPPercentage)} ></div>
 }
 
 templ ManaTracker(td TrackerData){
-    <span class="progress-label">Mana: {td.Mana}/{td.Mana} </span>
+    <span class="progress-label">Mana: {td.Mana}/{td.ManaBase} </span>
     <div class={"mana", manaAnimation(td.ManaStartPercentage, td.ManaPercentage)}></div> 
 }
 
