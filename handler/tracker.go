@@ -5,12 +5,12 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/log"
 	"github.com/itsig0/tallytome/view/hptracker"
 )
 
-func Tracker(c *fiber.Ctx) error {
+func Tracker(c fiber.Ctx) error {
 	hx := len(c.GetReqHeaders()["Hx-Request"]) > 0
 
 	data := hptracker.TrackerData{
@@ -28,7 +28,7 @@ func Tracker(c *fiber.Ctx) error {
 	return render(c, hptracker.Show(hx, data))
 }
 
-func TrackerUpdate(c *fiber.Ctx) error {
+func TrackerUpdate(c fiber.Ctx) error {
 
 	sess, err := store.Get(c)
 	if err != nil {
@@ -67,12 +67,14 @@ func TrackerUpdate(c *fiber.Ctx) error {
 	sess.Set(pre+"ManaStartPercentage", data.ManaStartPercentage)
 	sess.Set(pre+"ManaPercentage", data.ManaPercentage)
 
+	// sess.Set("tracker", data)
+
 	sess.Save()
 
 	return render(c, hptracker.TrackerColumn(data))
 }
 
-func TrackerDamage(c *fiber.Ctx) error {
+func TrackerDamage(c fiber.Ctx) error {
 
 	sess, err := store.Get(c)
 	if err != nil {
@@ -88,6 +90,10 @@ func TrackerDamage(c *fiber.Ctx) error {
 		return c.SendString("HP NOT NULL")
 	}
 
+	if damage < 0 {
+		damage *= -1
+	}
+
 	currentHP, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HP")))
 	if err != nil {
 		c.SendStatus(418)
@@ -100,13 +106,27 @@ func TrackerDamage(c *fiber.Ctx) error {
 		return err
 	}
 
+	heal := string(c.FormValue("heal"))
 	savingThrow := string(c.FormValue("savingthrow"))
-	if savingThrow == "on" {
+
+	if savingThrow == "on" || heal == "false" {
 		damageFloat := float64(damage) * 0.33333
 		damage -= int(math.Round(damageFloat))
 	}
 
+	if heal == "true" && damage > 0 {
+		damage *= -1
+	}
+
 	newHP := currentHP - damage
+
+	if newHP < 0 {
+		newHP = 0
+	}
+
+	if newHP > baseHP {
+		newHP = baseHP
+	}
 
 	newPercentage := (newHP * 100) / baseHP
 
@@ -125,7 +145,7 @@ func TrackerDamage(c *fiber.Ctx) error {
 	return render(c, hptracker.HPTracker(data))
 }
 
-func CheckStore(c *fiber.Ctx) error {
+func CheckStore(c fiber.Ctx) error {
 	sess, err := store.Get(c)
 	if err != nil {
 		return err

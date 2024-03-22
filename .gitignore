@@ -1,3 +1,4 @@
 tmp
 # we do not want these
 *_templ.txt
+*_templ.go
