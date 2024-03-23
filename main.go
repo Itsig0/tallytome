@@ -24,7 +24,8 @@ func main() {
 	tracker.Post("/update", handler.TrackerUpdate)
 	tracker.Post("/damage", handler.TrackerDamage)
 	tracker.Post("/mana", handler.TrackerMana)
-	tracker.Get("/check", handler.CheckStore)
+	tracker.Get("/newround", handler.TrackerRound)
+	tracker.Get("/reset", handler.TrackerReset)
 	// app.Get("/*", func(c *fiber.Ctx) error {
 	// 	return c.SendString("Hello, World!")
 	// })

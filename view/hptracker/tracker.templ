@@ -13,11 +13,24 @@ type TrackerData struct {
     ManaStartPercentage string
     ManaPercentage      string
     ManaRegen           string
+    Round              string
 }
 
 type DamageData struct {
     Values string
     SavingThrow string
+    Errors string
+}
+
+type ManaData struct {
+    Values string
+    Errors string
+}
+
+type BaseData struct {
+    HP string
+    Mana string
+    ManaRegen string
     Errors string
 }
 
@@ -27,28 +40,28 @@ var dd = DamageData {
     Errors: "",
 }
 
+var md = ManaData {
+    Values: "",
+    Errors: "",
+}
+
+var bd = BaseData {
+    HP: "",
+    Mana: "",
+    ManaRegen: "",
+    Errors: "",
+}
+
 templ Show(hx bool, td TrackerData){
     @layout.Base(hx){
         <div class="container">
 
-            <div class="grid mb-2">
-                <div class="start">
-                    <h2>Kampfrunde: </h2>
-                </div>
-
-                <div id="trackerBars" class="middle">
-                    
-                    @TrackerColumn(td)
-
-                </div>
-
-                <div class="text-right">
-                    <button>Nächste Runde</button>
-                </div>
+            <div id="trackerHeader" class="grid mb-2">
+                @TrackerHeader(td)
             </div>
 
             // base stats go here
-            @baseStats()
+            @BaseStats(td, bd)
 
             <div class="grid">
                 <div>
@@ -58,9 +71,10 @@ templ Show(hx bool, td TrackerData){
 
                 <div>
                     <h3>Mana</h3>
-                    @Mana()
+                    @Mana(md)
                 </div>
             </div>
+            <button type="button" hx-get="/hp-mana-tracker/reset" hx-target="main" hx-swap="innerHTML">Reset</button>
         </div>
         <script>
         document.addEventListener("DOMContentLoaded", (event) => {
@@ -84,15 +98,44 @@ templ Show(hx bool, td TrackerData){
                 var savingthrow = document.getElementById('savingthrow');
                 savingthrow.checked = false;
             });
-        })
 
+            document.body.addEventListener("ManaUpdated", function() {
+                var input = document.getElementById('manaInput');
+                input.value = "";
+                input.removeAttribute('aria-invalid');
+
+                var errorMessage = document.getElementById('manaError');
+                if (errorMessage) {
+                    errorMessage.parentNode.removeChild(errorMessage);
+                }
+            })
+
+            document.body.addEventListener("BaseUpdated", function() {
+                var errorMessage = document.getElementById('baseError');
+                if (errorMessage) {
+                    errorMessage.parentNode.removeChild(errorMessage);
+                }
+            })
+        })
         </script>
     }
 }
 
-// css loading(percent string) {
-// 	width: { fmt.Sprintf("%s%%", percent) };
-// }
+templ TrackerHeader(td TrackerData){
+    <div class="start">
+        <h2>Kampfrunde: {td.Round}</h2>
+    </div>
+
+    <div id="trackerBars" class="middle">
+        
+        @TrackerColumn(td)
+
+    </div>
+
+    <div class="text-right">
+        <button hx-get="/hp-mana-tracker/newround" hx-target="#trackerHeader" hx-swap="innerHTML">Nächste Runde</button>
+    </div>
+}
 
 templ TrackerColumn(td TrackerData){
 
@@ -126,8 +169,8 @@ css manaAnimation(from, to string) {
     --mana-to-width:{ fmt.Sprintf("%s%%", to) };
 }
 
-templ baseStats(){
-    <details open>
+templ BaseStats(td TrackerData, bd BaseData){
+    <details id="baseStats" open>
         <summary>Standard Werte</summary>
         <form class="grid" hx-post="/hp-mana-tracker/update" hx-target="#trackerBars">
 
@@ -137,12 +180,13 @@ templ baseStats(){
                     type="number"
                     placeholder="Trefferpunkte"
                     name="hp"
+                    value={td.HP}
                     required
                 />
             </label>
 
             <label>
-                Mana <input type="number" name="mana" placeholder="Mana" required/>
+                Mana <input type="number" name="mana" placeholder="Mana" value={td.Mana} required/>
             </label>
 
             <label>
@@ -151,16 +195,20 @@ templ baseStats(){
                     type="number"
                     name="manaregen"
                     placeholder="Regenerations %"
+                    value={td.ManaRegen}
                     required
                 />
             </label>
 
             <div class="lbl-offset">
-                <button type="submit">
+                <button type="submit" >
                     Go
                 </button>
             </div>
         </form>
+        if bd.Errors != "" {
+            <small id="baseError" class="error-helper">{bd.Errors}</small>
+        }
     </details>
 }
 
@@ -210,21 +258,35 @@ templ Hp(dd DamageData){
     </form>
 }
 
-templ Mana(){
-    <form hx-post="/hp-mana-tracker/mana" hx-target="#manaBar">
+templ Mana(md ManaData){
+    <form id="manaInputs" hx-post="/hp-mana-tracker/mana" hx-target="#manaBar">
         <fieldset role="group">
 
-            <button class="secondary" name="use">
+            <button class="secondary" name="use" value="true">
                 -
             </button>
 
-            <input name="manaInput" type="number" placeholder="" min="0" value="0"/>
+            <input 
+                id="manaInput"
+                name="manaInput" 
+                type="number" 
+                placeholder="Mana"
+                required
+                if md.Errors != "" {
+                    aria-invalid="true" 
+                }
+                value={md.Values}
+            />
 
-            <button class="secondary" name="add">
+            <button class="secondary" name="add" value="true">
                 +
             </button>
 
         </fieldset>
+        if md.Errors != "" {
+            <small id="manaError" class="error-helper">{md.Errors}</small>
+        }
+       
     </form>
    
 }
