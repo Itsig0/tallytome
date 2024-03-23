@@ -80,7 +80,7 @@
 
     --color-hp: #{$red-400};
     --color-mana: #{$azure-350};
-
+    --color-error: #{$red-550};
 }
 
 // *, ::after, ::before {
@@ -231,7 +231,9 @@ progress{
 }
 
 
-
+.error-helper{
+    color: var(--color-error);
+}
 
 
 // utility

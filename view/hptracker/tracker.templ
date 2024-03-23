@@ -15,6 +15,18 @@ type TrackerData struct {
     ManaRegen           string
 }
 
+type DamageData struct {
+    Values string
+    SavingThrow string
+    Errors string
+}
+
+var dd = DamageData {
+    Values: "",
+    SavingThrow: "",
+    Errors: "",
+}
+
 templ Show(hx bool, td TrackerData){
     @layout.Base(hx){
         <div class="container">
@@ -41,15 +53,40 @@ templ Show(hx bool, td TrackerData){
             <div class="grid">
                 <div>
                     <h3>TP</h3>
-                    @hp()
+                    @Hp(dd)
                 </div>
 
                 <div>
                     <h3>Mana</h3>
-                    @mana()
+                    @Mana()
                 </div>
             </div>
         </div>
+        <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener("htmx:beforeSwap", function(evt){
+                if (evt.detail.xhr.status === 422){
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }         
+            });
+
+            document.body.addEventListener("HPUpdated", function() {
+                var input = document.getElementById('damageInput');
+                input.value = "";
+                input.removeAttribute('aria-invalid');
+
+                var errorMessage = document.getElementById('damageError');
+                if (errorMessage) {
+                    errorMessage.parentNode.removeChild(errorMessage);
+                }
+
+                var savingthrow = document.getElementById('savingthrow');
+                savingthrow.checked = false;
+            });
+        })
+
+        </script>
     }
 }
 
@@ -63,7 +100,7 @@ templ TrackerColumn(td TrackerData){
         @HPTracker(td)
     </div>
 
-    <div class="progress">
+    <div id="manaBar" class="progress">
         @ManaTracker(td)
     </div>
 
@@ -127,44 +164,67 @@ templ baseStats(){
     </details>
 }
 
-templ hp(){
+templ Hp(dd DamageData){
 
-    <form hx-post="/hp-mana-tracker/damage" hx-target="#hpBar">
+    <form id="damageInputs" hx-post="/hp-mana-tracker/damage" hx-target="#hpBar">
+
         <fieldset role="group">
 
             <button class="secondary" name="damage" value="true">
                 -
             </button>
 
-            <input name="damageInput" type="number"/>
+            
+                <input 
+                    id="damageInput" 
+                    name="damageInput" 
+                    type="number" 
+                    placeholder="Schaden/Heilung"
+                    required
+                    if dd.Errors != "" {
+                        aria-invalid="true" 
+                    }
+                    value={dd.Values}
+                />
 
             <button class="secondary" name="heal" value="true">
                 +
             </button>
 
         </fieldset>
+        if dd.Errors != "" {
+            <small id="damageError" class="error-helper">{dd.Errors}</small>
+        }
+       
     
         <fieldset>
             <label for="savingthrow">
-                <input id="savingthrow" name="savingthrow" type="checkbox" role="switch"/>
+                <input id="savingthrow" name="savingthrow" type="checkbox" role="switch" 
+                if dd.SavingThrow != "" {
+                    checked
+                }
+                />
                 Verteidigungswurf
             </label>
         </fieldset>
     </form>
 }
 
-templ mana(){
-    <fieldset role="group">
+templ Mana(){
+    <form hx-post="/hp-mana-tracker/mana" hx-target="#manaBar">
+        <fieldset role="group">
 
-        <button class="secondary" name="use" hx-get="/hp-mana-tracker/check">
-            -
-        </button>
+            <button class="secondary" name="use">
+                -
+            </button>
 
-        <input type="number" placeholder="" min="0" value="0"/>
+            <input name="manaInput" type="number" placeholder="" min="0" value="0"/>
 
-        <button class="secondary" name="add">
-            +
-        </button>
+            <button class="secondary" name="add">
+                +
+            </button>
 
-    </fieldset>
+        </fieldset>
+    </form>
+   
 }

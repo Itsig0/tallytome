@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
@@ -11,6 +12,11 @@ import (
 )
 
 func Tracker(c fiber.Ctx) error {
+	sess, err := store.Get(c)
+	if err != nil {
+		return err
+	}
+
 	hx := len(c.GetReqHeaders()["Hx-Request"]) > 0
 
 	data := hptracker.TrackerData{
@@ -25,11 +31,17 @@ func Tracker(c fiber.Ctx) error {
 		ManaPercentage:      "0",
 	}
 
+	fields := []string{"HP", "HPBase", "HPStartPercentage", "HPPercentage", "Mana", "ManaBase", "ManaRegen", "ManaStartPercentage", "ManaPercentage"}
+	for _, field := range fields {
+		if val := sess.Get("tracker_" + field); val != nil {
+			reflect.ValueOf(&data).Elem().FieldByName(field).SetString(fmt.Sprint(val))
+		}
+	}
+
 	return render(c, hptracker.Show(hx, data))
 }
 
 func TrackerUpdate(c fiber.Ctx) error {
-
 	sess, err := store.Get(c)
 	if err != nil {
 		return err
@@ -47,14 +59,6 @@ func TrackerUpdate(c fiber.Ctx) error {
 		ManaPercentage:      "100",
 	}
 
-	// why no work?
-	// values := reflect.ValueOf(data)
-	// types := values.Type()
-	// prefix := "tracker_"
-	// for i := 0; i < values.NumField(); i++ {
-	// 	sess.Set(prefix+types.Field(i).Name, values.Field(i))
-	// 	log.Info("test")
-	// }
 	pre := "tracker_"
 	sess.Set(pre+"HP", data.HP)
 	sess.Set(pre+"HPBase", data.HPBase)
@@ -67,15 +71,12 @@ func TrackerUpdate(c fiber.Ctx) error {
 	sess.Set(pre+"ManaStartPercentage", data.ManaStartPercentage)
 	sess.Set(pre+"ManaPercentage", data.ManaPercentage)
 
-	// sess.Set("tracker", data)
-
 	sess.Save()
 
 	return render(c, hptracker.TrackerColumn(data))
 }
 
 func TrackerDamage(c fiber.Ctx) error {
-
 	sess, err := store.Get(c)
 	if err != nil {
 		return err
@@ -83,28 +84,29 @@ func TrackerDamage(c fiber.Ctx) error {
 
 	damage, err := strconv.Atoi(c.FormValue("damageInput"))
 	if err != nil {
-		c.SendStatus(418)
-		return err
-	} else if damage == 0 {
-		c.SendStatus(418)
-		return c.SendString("HP NOT NULL")
-	}
-
-	if damage < 0 {
-		damage *= -1
+		c.Status(422)
+		return c.SendString(err.Error())
+	} else if damage <= 0 {
+		c.Status(422)
+		c.Append("HX-Retarget", "#damageInputs")
+		return render(c, hptracker.Hp(hptracker.DamageData{
+			Errors: "Darf nicht 0 oder kleiner sein.",
+		}))
 	}
 
 	currentHP, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HP")))
 	if err != nil {
-		c.SendStatus(418)
-		return err
+		c.Status(422)
+		c.Append("HX-Retarget", "#damageInputs")
+		return render(c, hptracker.Hp(hptracker.DamageData{
+			Errors:      "Standard Werte nicht gesetzt.",
+			Values:      c.FormValue("damageInput"),
+			SavingThrow: c.FormValue("savingthrow"),
+		}))
 	}
 
-	baseHP, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HPBase")))
-	if err != nil {
-		c.SendStatus(418)
-		return err
-	}
+	// no error handling here because it's already done for currentHP
+	baseHP, _ := strconv.Atoi(fmt.Sprint(sess.Get("tracker_HPBase")))
 
 	heal := string(c.FormValue("heal"))
 	savingThrow := string(c.FormValue("savingthrow"))
@@ -114,7 +116,7 @@ func TrackerDamage(c fiber.Ctx) error {
 		damage -= int(math.Round(damageFloat))
 	}
 
-	if heal == "true" && damage > 0 {
+	if heal == "true" {
 		damage *= -1
 	}
 
@@ -142,7 +144,59 @@ func TrackerDamage(c fiber.Ctx) error {
 
 	sess.Save()
 
+	c.Append("HX-Trigger", "HPUpdated")
+
 	return render(c, hptracker.HPTracker(data))
+}
+
+func TrackerMana(c fiber.Ctx) error {
+	sess, err := store.Get(c)
+	if err != nil {
+		return err
+	}
+
+	mana, err := strconv.Atoi(c.FormValue("manaInput"))
+	if err != nil {
+		c.Status(422)
+		return c.SendString(err.Error())
+	} else if mana <= 0 {
+		c.Status(422)
+		// c.Append("HX-Retarget", "#damageInputs")
+		// return render(c, hptracker.Hp(hptracker.DamageData{
+		// 	Errors: "Darf nicht 0 oder kleiner sein.",
+		// }))
+		return nil
+	}
+
+	currentMana, err := strconv.Atoi(fmt.Sprint(sess.Get("tracker_Mana")))
+	if err != nil {
+		c.Status(422)
+		// c.Append("HX-Retarget", "#manaInputs")
+		// return render(c, hptracker.Mana(hptracker.DamageData{
+		// 	Errors: "Standard Werte nicht gesetzt.",
+		// }))
+		return err
+	}
+
+	baseMana, _ := strconv.Atoi(fmt.Sprint(sess.Get("tracker_ManaBase")))
+
+	newMana := currentMana - mana
+
+	newPercentage := (newMana * 100) / baseMana
+
+	data := hptracker.TrackerData{
+		Mana:                fmt.Sprint(newMana),
+		ManaBase:            fmt.Sprint(sess.Get("tracker_ManaBase")),
+		ManaStartPercentage: fmt.Sprint(sess.Get("tracker_ManaPercentage")),
+		ManaPercentage:      fmt.Sprint(newPercentage),
+	}
+
+	sess.Set("tracker_Mana", newMana)
+	sess.Set("tracker_ManaPercentage", newPercentage)
+
+	sess.Save()
+
+	return render(c, hptracker.ManaTracker(data))
 }
 
 func CheckStore(c fiber.Ctx) error {

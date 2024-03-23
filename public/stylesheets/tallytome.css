@@ -1880,6 +1880,7 @@ progress,
 :root {
   --color-hp: #f06048;
   --color-mana: #01aaff;
+  --color-error: #c52f21;
 }
 
 .text-center {
@@ -1975,6 +1976,10 @@ progress {
   100% {
     width: var(--hp-to-width);
   }
+}
+
+.error-helper {
+  color: var(--color-error);
 }
 
 .mb-0 {

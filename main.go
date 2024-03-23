@@ -23,6 +23,7 @@ func main() {
 	tracker.Get("/", handler.Tracker)
 	tracker.Post("/update", handler.TrackerUpdate)
 	tracker.Post("/damage", handler.TrackerDamage)
+	tracker.Post("/mana", handler.TrackerMana)
 	tracker.Get("/check", handler.CheckStore)
 	// app.Get("/*", func(c *fiber.Ctx) error {
 	// 	return c.SendString("Hello, World!")
