@@ -6,4 +6,4 @@ templ:
 	@templ generate -watch -proxy=http://localhost:3000
 
 sass:
-	@sass --no-source-map --watch  public/stylesheets/tallytome.scss public/stylesheets/tallytome.css
+	@sass --no-source-map --watch  view/stylesheets/tallytome.scss public/tallytome.css
