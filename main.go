@@ -1,12 +1,20 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/itsig0/tallytome/handler"
 )
 
 func main() {
+	var port int
+
+	flag.IntVar(&port, "p", 3000, "Provide a port number")
+
+	flag.Parse()
 
 	app := fiber.New(fiber.Config{
 		ServerHeader: "TallyTome",
@@ -30,5 +38,5 @@ func main() {
 	// 	return c.SendString("Hello, World!")
 	// })
 
-	app.Listen(":3000")
+	app.Listen(fmt.Sprint(":", port))
 }
