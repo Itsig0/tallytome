@@ -1,39 +1,30 @@
 package layout
 
-templ Base(hx bool){
-
-if hx == false {
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-        <link rel="stylesheet" href="/tallytome.css" />
-
-        <script src="/scripts/htmx.js"></script>
-        // <script src="/scripts/alpine.js" defer></script>
-
-        <title>Tallytome</title>
-    </head>
-    <body>
-
-        <header>
-            @header()
-        </header>
-
-        <main>
-            { children... }
-        </main>
-        
-        // <footer> 
-        //     @footer()
-        // </footer>
-        
-    </body>
-</html>
-}else{
-   { children... }
-}
-
+templ Base(hx bool) {
+	if hx == false {
+		<!DOCTYPE html>
+		<html lang="en" data-theme="light">
+			<head>
+				<meta charset="UTF-8"/>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+				<link rel="stylesheet" href="/tallytome.css"/>
+				<script src="/scripts/htmx.js"></script>
+				<script src="/scripts/tallytome.js"></script>
+				<title>Tallytome</title>
+			</head>
+			<body>
+				<header>
+					@header()
+				</header>
+				<main>
+					{ children... }
+				</main>
+				// <footer>
+				// @footer()
+				// </footer>
+			</body>
+		</html>
+	} else {
+		{ children... }
+	}
 }

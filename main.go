@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/itsig0/tallytome/handler"
 )
 
@@ -22,6 +23,7 @@ func main() {
 
 	// compression baby
 	app.Use(compress.New())
+	app.Use(logger.New())
 
 	app.Static("/", "./public")
 

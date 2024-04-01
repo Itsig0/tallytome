@@ -146,7 +146,7 @@ func TrackerDamage(c fiber.Ctx) error {
 	heal := c.FormValue("heal")
 	savingThrow := c.FormValue("savingthrow")
 
-	if savingThrow == "on" || heal == "false" {
+	if savingThrow == "on" && heal != "true" {
 		damageFloat := float64(damage) * 0.33333
 		damage -= int(math.Round(damageFloat))
 	}
