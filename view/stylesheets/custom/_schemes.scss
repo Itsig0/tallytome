@@ -1,5 +1,5 @@
 @use "sass:map";
-@use "../pico/settings" as *;
+@use "../node_modules/@picocss/pico/scss/settings" as *;
 
 @use "light";
 @use "dark";

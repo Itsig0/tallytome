@@ -3,3 +3,7 @@ tmp
 *_templ.txt
 *_templ.go
 public/tallytome.css
+
+node_modules
+package-lock.json
+package.json
