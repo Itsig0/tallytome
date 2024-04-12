@@ -191,7 +191,7 @@ progress{
     justify-content: center;
     align-items: center;
     margin-bottom: calc(var(--pico-spacing) * .5);
-   
+
 
     .progress-label{
         position: absolute;
@@ -226,7 +226,7 @@ progress{
                 100% {width: var(--hp-to-width);}
             }
         }
-       
+
     }
 }
 
@@ -259,6 +259,14 @@ progress{
     margin-bottom: var(--pico-spacing);
 }
 
+#loginContainer {
+  height: 100vh;
+  max-width: 510px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 // form elements
 
 // form{
@@ -284,7 +292,7 @@ progress{
 //     &:not([type="checkbox"], [type="radio"]), select, textarea {
 //         margin-bottom: 1rem;
 //     }
-    
+
 //     &:not([type="submit"], [type="button"], [type="reset"], [type="range"], [type="file"], [readonly]):focus {
 //         border-color:  var(--primary);
 //     }
@@ -385,10 +393,10 @@ progress{
 //     }
 
 //     &[value]::-webkit-progress-value {
-       
+
 //         border-radius: var(--border-radius);
-       
-//     }   
+
+//     }
 
 //     &::-moz-progress-bar {
 //         background-color: var(--primary);
@@ -401,14 +409,14 @@ progress{
 //                 to right,
 //                 var(--primary) 30%,
 //                 var(--grey9) 30%
-//             ) 
+//             )
 //         top left/150% 150% no-repeat;
 //         animation: progress-indeterminate 1.5s linear infinite;
-    
+
 //         &[value]::-webkit-progress-value {
 //         background-color: transparent;
 //         }
-    
+
 //         &::-moz-progress-bar {
 //         background-color: transparent;
 //         }
@@ -418,7 +426,7 @@ progress{
 //         0% {
 //           background-position: 200% 0;
 //         }
-    
+
 //         100% {
 //           background-position: -200% 0;
 //         }

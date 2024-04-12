@@ -39,6 +39,7 @@ func main() {
 	// app.Get("/*", func(c *fiber.Ctx) error {
 	// 	return c.SendString("Hello, World!")
 	// })
+	app.Get("/login", handler.Login)
 
 	app.Listen(fmt.Sprint(":", port))
 }

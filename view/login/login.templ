@@ -1,0 +1,25 @@
+package login
+
+templ Show() {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="dark">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="/tallytome.css"/>
+			<script src="/scripts/htmx.js"></script>
+			<script src="/scripts/tallytome.js"></script>
+			<title>Anmelden | Tallytome</title>
+		</head>
+		<body>
+			<main id="loginContainer" class="container">
+				<h1>Anmelden</h1>
+				<form>
+					<input type="text" placeholder="Login"/>
+					<input type="password" placeholder="Passwort"/>
+					<button type="submit">Anmelden</button>
+				</form>
+			</main>
+		</body>
+	</html>
+}
