@@ -12,7 +12,7 @@ build:
 	@rm -rf tmp/release/tallytome
 	@mkdir -p tmp/release/tallytome
 	@templ generate
-	@go build main.go
+	@GOARCH="amd64" GOOS="linux" go build main.go
 	@mv main tallytome
 	@mv tallytome tmp/release/tallytome
 	@cp -r public tmp/release/tallytome
