@@ -3,7 +3,7 @@ run:
 	@go run main.go
 
 templ:
-	@templ generate -watch -proxy=http://localhost:3000
+	@templ generate -watch -proxy=http://127.0.0.1:3000
 
 sass:
 	@sass --no-source-map --watch  view/stylesheets/tallytome.scss public/tallytome.css

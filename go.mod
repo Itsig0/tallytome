@@ -3,7 +3,7 @@ module github.com/itsig0/tallytome
 go 1.22.1
 
 require (
-	github.com/a-h/templ v0.2.598
+	github.com/a-h/templ v0.2.663
 	github.com/gofiber/fiber/v3 v3.0.0-beta.2
 )
 

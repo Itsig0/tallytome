@@ -70,7 +70,10 @@ templ Show(hx bool, td TrackerData) {
 					@Mana(md)
 				</div>
 			</div>
-			<button type="button" hx-get="/hp-mana-tracker/reset" hx-target="main" hx-swap="innerHTML">Reset</button>
+            <details>
+                <summary>Extras</summary>
+			    <button type="button" hx-get="/hp-mana-tracker/reset" hx-target="main" hx-swap="innerHTML">Reset</button>
+            </details>
 		</div>
 	}
 }
@@ -169,9 +172,11 @@ templ Hp(dd DamageData) {
 		}
 		<fieldset>
 			<label for="savingthrow">
-				<input id="savingthrow" name="savingthrow" type="checkbox" role="switch" if dd.SavingThrow !="" {
-	checked
-}/>
+				<input id="savingthrow" name="savingthrow" type="checkbox" role="switch" 
+                if dd.SavingThrow != "" { 
+                    checked
+                }
+                />
 				Verteidigungswurf
 			</label>
 		</fieldset>
